@@ -69,6 +69,22 @@ protected. Files with unsupported/incomplete syntax or non-UTF-8 encoding are le
 to IntelliJ. A line that no layout can fit (for example, an indivisible argument)
 is left unchanged.
 
+## Git pre-commit hook
+
+`scripts/format_staged.py` runs the same pipeline on commit. It takes the staged
+`.java` files the commit adds or modifies, exports their **index** content together
+with the staged `.editorconfig` files into a temporary mirror, formats the whole
+files there, and writes the result back into the index. A fully staged file is
+updated in the working tree as well; a partially staged one only in the index, so
+its unstaged edits stay as they were. Merges, cherry-picks and reverts are skipped.
+A formatting failure aborts the commit. Skip formatting for one commit with
+`git -c java-formatting.skip=true commit ...` (or `JAVA_FORMATTING_SKIP=1`). The
+formatter log is `pre-commit.log` in the runtime directory.
+
+Install it per clone, outside version control: call the script from
+`.git/hooks/pre-commit`, or, when `core.hooksPath` points to tracked hooks, from a
+local dispatcher that runs the tracked hook of the same name first.
+
 ## Setup and maintenance
 
 Run `python3 scripts/install_hook.py` from this skill to register the user-level
